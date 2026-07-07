@@ -1,6 +1,6 @@
 import "./App.css";
-import React, { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import  { useState } from "react";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
@@ -21,7 +21,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       {/* Navbar */}
       <Navbar onSelectCategory={handleCategorySelect} />
 
@@ -48,7 +48,7 @@ function App() {
         {/* User */}
         <Route path="/cart" element={<Cart />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
