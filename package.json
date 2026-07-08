@@ -2,7 +2,7 @@
   "name": "ecom-frontend-1",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://github.com/sameena0405/ecomhub-frontend/",
+  "homepage": "https://sameena0405.github.io/ecomhub-frontend/",
   "type": "module",
   "scripts": {
     "dev": "vite",

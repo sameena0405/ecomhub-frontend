@@ -5,42 +5,27 @@ import axios from "axios";
 
 const Product = () => {
   const { id } = useParams();
-
-  const {
-    addToCart,
-    removeFromCart,
-    refreshData,
-  } = useContext(AppContext);
+  const { addToCart, removeFromCart, refreshData } = useContext(AppContext);
 
   const [product, setProduct] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
-
   const navigate = useNavigate();
 
-  // NEW
   const role = localStorage.getItem("role");
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/products/${id}`
-        );
-
+        const response = await axios.get(`http://localhost:8080/api/products/${id}`);
         setProduct(response.data);
 
         const imageResponse = await axios.get(
-          `http://localhost:8080/api/products/${id}/image`,
-          {
-            responseType: "blob",
-          }
+            `http://localhost:8080/api/products/${id}/image`,
+            { responseType: "blob" }
         );
-
-        setImageUrl(
-          URL.createObjectURL(imageResponse.data)
-        );
+        setImageUrl(URL.createObjectURL(imageResponse.data));
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching product:", error);
       }
     };
 
@@ -49,19 +34,13 @@ const Product = () => {
 
   const deleteProduct = async () => {
     try {
-      await axios.delete(
-        `http://localhost:8080/api/products/${id}`
-      );
-
+      await axios.delete(`http://localhost:8080/api/products/${id}`);
       removeFromCart(id);
-
       alert("Product deleted successfully");
-
       refreshData();
-
       navigate("/home");
     } catch (error) {
-      console.error(error);
+      console.error("Error deleting product:", error);
     }
   };
 
@@ -70,115 +49,83 @@ const Product = () => {
   };
 
   const handleAddToCart = () => {
-    addToCart(product);
-    alert("Product added to cart");
+    if (product) {
+      addToCart(product);
+      alert("Product added to cart");
+    }
   };
 
   if (!product) {
     return (
-      <h2
-        className="text-center"
-        style={{ padding: "10rem" }}
-      >
-        Loading...
-      </h2>
+        <h2 className="text-center" style={{ padding: "10rem" }}>
+          Loading...
+        </h2>
     );
   }
 
   return (
-    <div className="containers">
-      <img
-        className="left-column-img"
-        src={imageUrl}
-        alt={product.imageName}
-      />
+      <div className="containers">
+        {/* Product Image */}
+        <img
+            className="left-column-img"
+            src={imageUrl || "https://via.placeholder.com/300x200?text=No+Image"}
+            alt={product.imageName || "Product Image"}
+        />
 
-      <div className="right-column">
-        <div className="product-description">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>{product.category}</span>
-
-            <div className="release-date">
-              <h6>
-                Product listed on :
-                <i>
-                  {" "}
-                  {new Date(
-                    product.releaseDate
-                  ).toLocaleDateString()}
-                </i>
-              </h6>
+        {/* Product Details */}
+        <div className="right-column">
+          <div className="product-description">
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>{product.category}</span>
+              <div className="release-date">
+                <h6>
+                  Product listed on:{" "}
+                  <i>{new Date(product.releaseDate).toLocaleDateString()}</i>
+                </h6>
+              </div>
             </div>
+
+            <h1>{product.name}</h1>
+            <i>{product.brand}</i>
+
+            <p style={{ fontWeight: "bold", marginTop: "15px" }}>
+              PRODUCT DESCRIPTION:
+            </p>
+            <p>{product.description}</p>
           </div>
 
-          <h1>{product.name}</h1>
+          {/* Price & Stock */}
+          <div className="product-price">
+            <span>₹ {product.price}</span>
 
-          <i>{product.brand}</i>
+            {/* USER ONLY */}
+            {role !== "admin" && (
+                <button className="cart-btn" onClick={handleAddToCart}>
+                  Add To Cart
+                </button>
+            )}
 
-          <p
-            style={{
-              fontWeight: "bold",
-              marginTop: "15px",
-            }}
-          >
-            PRODUCT DESCRIPTION :
-          </p>
+            <h6>
+              Stock Available:{" "}
+              <i style={{ color: "green", fontWeight: "bold" }}>
+                {product.stockQuantity}
+              </i>
+            </h6>
+          </div>
 
-          <p>{product.description}</p>
-        </div>
-
-        <div className="product-price">
-          <span>₹ {product.price}</span>
-
-          {/* USER ONLY */}
-          {role !== "admin" && (
-            <button
-              className="cart-btn"
-              onClick={handleAddToCart}
-            >
-              Add To Cart
-            </button>
+          {/* ADMIN ONLY */}
+          {role === "admin" && (
+              <div className="update-button" style={{ marginTop: "1rem" }}>
+                <button className="btn btn-primary me-2" onClick={handleEditClick}>
+                  Update
+                </button>
+                <button className="btn btn-danger" onClick={deleteProduct}>
+                  Delete
+                </button>
+              </div>
           )}
-
-          <h6>
-            Stock Available :
-            <i
-              style={{
-                color: "green",
-                fontWeight: "bold",
-              }}
-            >
-              {" "}
-              {product.stockQuantity}
-            </i>
-          </h6>
         </div>
-
-        {/* ADMIN ONLY */}
-        {role === "admin" && (
-          <div className="update-button">
-            <button
-              className="btn btn-primary"
-              onClick={handleEditClick}
-            >
-              Update
-            </button>
-
-            <button
-              className="btn btn-danger"
-              onClick={deleteProduct}
-            >
-              Delete
-            </button>
-          </div>
-        )}
       </div>
-    </div>
   );
 };
 
