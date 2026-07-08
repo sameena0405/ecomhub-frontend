@@ -29,7 +29,7 @@ const Cart = () => {
                     { responseType: "blob" }
                 );
                 const imageUrl = URL.createObjectURL(response.data);
-                return { ...item, imageUrl };
+                return { ...item, imageUrl: unplugged };
               } catch (error) {
                 console.error("Error fetching image:", error);
                 return { ...item, imageUrl: "https://via.placeholder.com/150" };

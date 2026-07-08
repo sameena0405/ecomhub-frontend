@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import AppContext from "../Context/Context";
-import axios from "axios";
+import API from "../axios"; // ✅ use shared axios instance
 
 const Product = () => {
   const { id } = useParams();
@@ -16,14 +16,17 @@ const Product = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/products/${id}`);
+        const response = await API.get(`/products/${id}`); // ✅ use API
         setProduct(response.data);
 
-        const imageResponse = await axios.get(
-            `http://localhost:8080/api/products/${id}/image`,
-            { responseType: "blob" }
-        );
-        setImageUrl(URL.createObjectURL(imageResponse.data));
+        try {
+          const imageResponse = await API.get(`/products/${id}/image`, {
+            responseType: "blob",
+          });
+          setImageUrl(URL.createObjectURL(imageResponse.data));
+        } catch {
+          setImageUrl("https://via.placeholder.com/300x200?text=No+Image"); // ✅ fallback
+        }
       } catch (error) {
         console.error("Error fetching product:", error);
       }
@@ -34,7 +37,7 @@ const Product = () => {
 
   const deleteProduct = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/products/${id}`);
+      await API.delete(`/products/${id}`); // ✅ use API
       removeFromCart(id);
       alert("Product deleted successfully");
       refreshData();
@@ -80,7 +83,11 @@ const Product = () => {
               <div className="release-date">
                 <h6>
                   Product listed on:{" "}
-                  <i>{new Date(product.releaseDate).toLocaleDateString()}</i>
+                  <i>
+                    {product.releaseDate
+                        ? new Date(product.releaseDate).toLocaleDateString()
+                        : "N/A"}
+                  </i>
                 </h6>
               </div>
             </div>

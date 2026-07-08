@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import API from "../axios"; // ✅ use shared axios instance
 
 const Navbar = ({ onSelectCategory }) => {
   const navigate = useNavigate();
@@ -36,9 +36,9 @@ const Navbar = ({ onSelectCategory }) => {
     if (input.trim().length > 0) {
       setShowSearchResults(true);
       try {
-        const response = await axios.get(
-            `http://localhost:8080/api/products/search?keyword=${input.trim().toLowerCase()}`
-        );
+        const response = await API.get(
+            `/products/search?keyword=${input.trim().toLowerCase()}`
+        ); // ✅ use API instance
         setSearchResults(response.data);
         setNoResults(response.data.length === 0);
       } catch (error) {

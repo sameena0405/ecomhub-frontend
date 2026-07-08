@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import API from "../axios"; // ✅ use shared axios instance
 
 const UpdateProduct = () => {
   const { id } = useParams();
@@ -26,22 +26,22 @@ const UpdateProduct = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(
-            `http://localhost:8080/api/products/${id}`
-        );
+        const response = await API.get(`/products/${id}`); // ✅ use API
         setProduct(response.data);
 
         // Fetch image
-        const responseImage = await axios.get(
-            `http://localhost:8080/api/products/${id}/image`,
-            { responseType: "blob" }
-        );
-
-        const imageFile = await convertUrlToFile(
-            responseImage.data,
-            response.data.imageName
-        );
-        setImage(imageFile);
+        try {
+          const responseImage = await API.get(`/products/${id}/image`, {
+            responseType: "blob",
+          });
+          const imageFile = await convertUrlToFile(
+              responseImage.data,
+              response.data.imageName
+          );
+          setImage(imageFile);
+        } catch {
+          setImage(null); // fallback if image not found
+        }
 
         setUpdateProduct(response.data);
       } catch (error) {
@@ -65,13 +65,9 @@ const UpdateProduct = () => {
     );
 
     try {
-      await axios.put(
-          `http://localhost:8080/api/products/${id}`,
-          updatedProduct,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-      );
+      await API.put(`/products/${id}`, updatedProduct, {
+        headers: { "Content-Type": "multipart/form-data" },
+      }); // ✅ use API
       alert("Product updated successfully!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -168,12 +164,12 @@ const UpdateProduct = () => {
                   name="category"
               >
                 <option value="">Select category</option>
-                <option value="laptop">Laptop</option>
-                <option value="headphone">Headphone</option>
-                <option value="mobile">Mobile</option>
-                <option value="electronics">Electronics</option>
-                <option value="toys">Toys</option>
-                <option value="fashion">Fashion</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Headphone">Headphone</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Toys">Toys</option>
+                <option value="Fashion">Fashion</option>
               </select>
             </div>
 

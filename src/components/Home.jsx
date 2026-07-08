@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import API from "../axios"; // ✅ use shared axios instance
 import AppContext from "../Context/Context";
 import unplugged from "../assets/unplugged.png";
 
@@ -24,15 +24,15 @@ const Home = ({ selectedCategory }) => {
                 const updatedProducts = await Promise.all(
                     data.map(async (product) => {
                         try {
-                            const response = await axios.get(
-                                `http://localhost:8080/api/products/${product.id}/image`,
+                            const response = await API.get(
+                                `/products/${product.id}/image`,
                                 { responseType: "blob" }
                             );
                             const imageUrl = URL.createObjectURL(response.data);
                             return { ...product, imageUrl };
                         } catch (error) {
                             console.error("Error fetching image for product ID:", product.id, error);
-                            return { ...product, imageUrl: unplugged }; // fallback image
+                            return { ...product, imageUrl: unplugged }; // ✅ fallback image
                         }
                     })
                 );
